@@ -80,7 +80,7 @@ class AccountController {
 
     @GetMapping("/beheer/deelnemers/nieuw")
     String newAccount(Model model) {
-        model.addAttribute("account", new NewAccount("", "", "", "", ""));
+        model.addAttribute("account", new NewAccount("", "", "", ""));
         model.addAttribute("role", Role.USER);
         return "account-new";
     }
@@ -99,7 +99,7 @@ class AccountController {
     String edit(@PathVariable UUID id, Model model) {
         var account = accounts.managed(id);
         model.addAttribute("account", new EditAccount(account.username(), account.person().displayName(),
-                account.person().bio(), account.role(), account.person().enabled()));
+                account.role(), account.person().enabled()));
         return editPage(account.person(), model);
     }
 

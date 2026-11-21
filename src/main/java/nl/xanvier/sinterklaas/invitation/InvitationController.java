@@ -17,7 +17,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 @Controller
 class InvitationController {
 
-    record ProfileDraft(@NotBlank @Size(max = 80) String displayName, @Size(max = 500) String bio,
+    record ProfileDraft(@NotBlank @Size(max = 80) String displayName,
                         ChocolateFlavor chocolateFlavor) {}
 
     private final InvitationService invitations;
@@ -28,7 +28,7 @@ class InvitationController {
 
     @GetMapping("/beheer/uitnodigingen")
     String manage(Model model) {
-        if (!model.containsAttribute("draft")) model.addAttribute("draft", new ProfileDraft("", "", null));
+        if (!model.containsAttribute("draft")) model.addAttribute("draft", new ProfileDraft("", null));
         model.addAttribute("invitations", invitations.entries());
         return "invitations";
     }
@@ -39,7 +39,7 @@ class InvitationController {
                  jakarta.servlet.http.HttpServletResponse response) {
         response.setHeader("Cache-Control", "no-store");
         WebForms.submit(errors, () -> model.addAttribute("invitationLink",
-                invitations.issue(draft.displayName(), draft.bio(), draft.chocolateFlavor(), photo)));
+                invitations.issue(draft.displayName(), draft.chocolateFlavor(), photo)));
         return manage(model);
     }
 

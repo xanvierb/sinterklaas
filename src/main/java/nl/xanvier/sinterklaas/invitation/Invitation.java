@@ -18,7 +18,6 @@ class Invitation {
     private Instant redeemedAt;
     private Instant cancelledAt;
     private String displayName;
-    private String bio;
     private UUID avatar;
     @Enumerated(EnumType.STRING)
     @Column(length = 12)
@@ -26,14 +25,13 @@ class Invitation {
 
     protected Invitation() {}
 
-    Invitation(UUID id, String hash, UUID creator, Instant now, Instant expires, String displayName, String bio, UUID avatar, ChocolateFlavor chocolateFlavor) {
+    Invitation(UUID id, String hash, UUID creator, Instant now, Instant expires, String displayName, UUID avatar, ChocolateFlavor chocolateFlavor) {
         this.id = id;
         tokenHash = hash;
         createdBy = creator;
         createdAt = now;
         expiresAt = expires;
         this.displayName = displayName;
-        this.bio = bio;
         this.avatar = avatar;
         this.chocolateFlavor = chocolateFlavor;
     }

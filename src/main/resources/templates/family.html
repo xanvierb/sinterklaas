@@ -50,7 +50,7 @@
         <p>Je kind verschijnt bij Familie. Ouders beheren de wensen en beantwoorden berichten via hun eigen account.</p>
         <form class="fields" method="post" th:action="@{/gezin}" th:object="${child}" enctype="multipart/form-data">
             <div th:replace="~{fields :: errors}"></div>
-            <div th:replace="~{fields :: profileFields}"></div>
+            <div th:replace="~{fields :: displayNameField}"></div>
             <div>
                 <label for="photo" class="form-label">Profielfoto (optioneel)</label>
                 <input type="file" name="photo" id="photo" class="form-control" accept="image/png,image/jpeg,image/webp,image/avif,.webp,.avif" data-photo-upload>

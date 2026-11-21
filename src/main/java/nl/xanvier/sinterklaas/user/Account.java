@@ -14,7 +14,9 @@ class Account {
     private String username;
     private String passwordHash;
     private String displayName;
-    private String bio;
+    // Keep existing biographies and supply a value for the legacy NOT NULL column.
+    @Column(updatable = false)
+    private String bio = "";
     private UUID avatar;
     @Enumerated(EnumType.STRING)
     private Role role;
@@ -33,12 +35,11 @@ class Account {
 
     protected Account() {}
 
-    Account(String username, String passwordHash, String displayName, String bio, Role role, Instant now) {
+    Account(String username, String passwordHash, String displayName, Role role, Instant now) {
         id = UUID.randomUUID();
         this.username = username;
         this.passwordHash = passwordHash;
         this.displayName = displayName;
-        this.bio = bio;
         this.role = role;
         enabled = true;
         colorMode = ColorMode.DARK;
@@ -51,22 +52,20 @@ class Account {
         childProfile = true;
     }
 
-    void edit(String username, String name, String bio, Role role, boolean enabled, UUID avatar, Instant now) {
+    void edit(String username, String name, Role role, boolean enabled, UUID avatar, Instant now) {
         if (!this.username.equals(username) || this.role != role || this.enabled != enabled) {
             authRevision++;
         }
         this.username = username;
         this.displayName = name;
-        this.bio = bio;
         this.role = role;
         this.enabled = enabled;
         this.avatar = avatar;
         updatedAt = now;
     }
 
-    void profile(String name, String bio, ColorMode mode, Palette palette, ChocolateFlavor chocolateFlavor, UUID avatar, Instant now) {
+    void profile(String name, ColorMode mode, Palette palette, ChocolateFlavor chocolateFlavor, UUID avatar, Instant now) {
         displayName = name;
-        this.bio = bio;
         colorMode = mode;
         this.palette = palette;
         this.chocolateFlavor = chocolateFlavor;

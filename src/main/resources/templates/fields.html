@@ -13,29 +13,23 @@
         <input class="form-control" th:field="*{username}" th:errorclass="is-invalid" maxlength="32" minlength="3"
                pattern="[a-zA-Z0-9][a-zA-Z0-9._\-]{2,31}" autocomplete="username" required>
     </div>
-    <th:block th:replace="~{fields :: profileFields}"></th:block>
+    <th:block th:replace="~{fields :: displayNameField}"></th:block>
 </div>
-<div th:fragment="profileFields" class="fields">
-    <div th:fragment="displayNameField">
-        <label for="displayName" class="form-label">Weergavenaam</label>
-        <input class="form-control" th:field="*{displayName}" th:errorclass="is-invalid" maxlength="80" required>
-    </div>
-    <div>
-        <label for="bio" class="form-label">Over mij</label>
-        <textarea class="form-control" th:field="*{bio}" th:errorclass="is-invalid" rows="3" maxlength="500"></textarea>
-    </div>
+<div th:fragment="displayNameField">
+    <label for="displayName" class="form-label">Weergavenaam</label>
+    <input class="form-control" th:field="*{displayName}" th:errorclass="is-invalid" maxlength="80" required>
 </div>
 <div th:fragment="newPassword" class="fields">
     <div>
         <label for="password" class="form-label">Nieuw wachtwoord</label>
         <input id="password" name="password" type="password" class="form-control" autocomplete="new-password"
-               minlength="12" maxlength="72" aria-describedby="passwordHelp" required>
-        <div id="passwordHelp" class="form-text">Gebruik minimaal 12 tekens. Het wachtwoord mag maximaal 72 bytes bevatten.</div>
+               minlength="8" maxlength="72" aria-describedby="passwordHelp" required>
+        <div id="passwordHelp" class="form-text">Gebruik minimaal 8 tekens. Het wachtwoord mag maximaal 72 bytes bevatten.</div>
     </div>
     <div>
         <label for="confirmation" class="form-label">Herhaal het nieuwe wachtwoord</label>
         <input id="confirmation" name="confirmation" type="password" class="form-control" autocomplete="new-password"
-               minlength="12" maxlength="72" required>
+               minlength="8" maxlength="72" required>
     </div>
 </div>
 <div th:fragment="adminNav" th:if="${viewer != null and viewer.role.name() == 'ADMIN'}" class="mb-4 d-print-none">

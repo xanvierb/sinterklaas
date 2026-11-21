@@ -24,7 +24,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 class FamilyController {
-    record ChildForm(@NotBlank @Size(max = 80) String displayName, @Size(max = 500) String bio,
+    record ChildForm(@NotBlank @Size(max = 80) String displayName,
                      ChocolateFlavor chocolateFlavor) {}
     record ParentLink(UUID childId, UUID parentId, String name, boolean accepted) {}
     record ParentChoice(UUID id, String name) {}
@@ -53,7 +53,7 @@ class FamilyController {
     @GetMapping("/gezin")
     String index(Model model) {
         var parent = parent();
-        if (!model.containsAttribute("child")) model.addAttribute("child", new ChildForm("", "", null));
+        if (!model.containsAttribute("child")) model.addAttribute("child", new ChildForm("", null));
         var parents = jdbc.query("""
                 SELECT p.child_id, p.parent_id, u.display_name, p.accepted
                 FROM child_parent p JOIN app_user u ON u.id = p.parent_id
@@ -89,11 +89,10 @@ class FamilyController {
         if (WebForms.submit(errors, () -> {
             var now = clock.instant();
             String name = form.displayName().strip();
-            String bio = form.bio() == null ? "" : form.bio().strip();
             Account child = new Account("kind-" + UUID.randomUUID().toString().replace("-", "").substring(0, 24),
-                    "!disabled", name, bio, Role.USER, now);
+                    "!disabled", name, Role.USER, now);
             child.markAsChild();
-            child.profile(name, bio, ColorMode.DARK, Palette.SINTERKLAAS,
+            child.profile(name, ColorMode.DARK, Palette.SINTERKLAAS,
                     form.chocolateFlavor(), images.replace(null, photo), now);
             accounts.saveAndFlush(child);
             jdbc.update("INSERT INTO child_parent (child_id, parent_id, accepted) VALUES (?, ?, TRUE)",

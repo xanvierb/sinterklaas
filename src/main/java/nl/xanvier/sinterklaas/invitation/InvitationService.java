@@ -55,14 +55,14 @@ class InvitationService {
     }
 
     @Transactional
-    public String issue(String displayName, String bio, ChocolateFlavor flavor, MultipartFile photo) {
+    public String issue(String displayName, ChocolateFlavor flavor, MultipartFile photo) {
         UUID admin = current.requireAdmin().id();
         UUID id = UUID.randomUUID();
         String token = tokens.forInvitation(id);
         Instant now = clock.instant();
         UUID avatar = images.replace(null, photo);
         invitations.save(new Invitation(id, hash(token), admin, now, now.plus(lifetime),
-                displayName.strip(), bio == null ? null : bio.strip(), avatar, flavor));
+                displayName.strip(), avatar, flavor));
         return baseUrl + "uitnodiging#" + token;
     }
 
@@ -122,7 +122,7 @@ class InvitationService {
         boolean prepared = invitation.getDisplayName() != null;
         String name = prepared ? invitation.getDisplayName() : form.username();
         ChocolateFlavor flavor = form.chocolateFlavor() == null ? invitation.getChocolateFlavor() : form.chocolateFlavor();
-        accounts.createFromInvitation(new NewAccount(form.username(), name, prepared ? invitation.getBio() : "",
+        accounts.createFromInvitation(new NewAccount(form.username(), name,
                 form.password(), form.confirmation()), invitation.getAvatar(), flavor);
         invitation.redeem(now);
     }

@@ -20,7 +20,7 @@ import org.springframework.web.server.ResponseStatusException;
 @Service
 public class AccountService implements UserDetailsService {
 
-    public record Person(UUID id, String displayName, String bio, boolean hasAvatar, boolean enabled, ChocolateFlavor chocolateFlavor, boolean childProfile) {}
+    public record Person(UUID id, String displayName, boolean hasAvatar, boolean enabled, ChocolateFlavor chocolateFlavor, boolean childProfile) {}
 
     public record AccountView(Person person, String username, Role role, ColorMode colorMode, Palette palette) {}
 
@@ -99,7 +99,7 @@ public class AccountService implements UserDetailsService {
     @Transactional
     public void createFromInvitation(AccountForms.NewAccount form, UUID avatar, ChocolateFlavor chocolateFlavor) {
         Account account = newAccount(form, Role.USER);
-        account.profile(account.getDisplayName(), account.getBio(), account.getColorMode(), account.getPalette(),
+        account.profile(account.getDisplayName(), account.getColorMode(), account.getPalette(),
                 chocolateFlavor, avatar, clock.instant());
         accounts.save(account);
     }
@@ -118,14 +118,14 @@ public class AccountService implements UserDetailsService {
         String name = normalize(form.username());
         checkUsername(name, id);
         UUID avatar = images.replace(account.getAvatar(), photo);
-        account.edit(name, form.displayName().strip(), bio(form.bio()), form.role(), form.enabled(), avatar, clock.instant());
+        account.edit(name, form.displayName().strip(), form.role(), form.enabled(), avatar, clock.instant());
     }
 
     @Transactional
     public void editProfile(AccountForms.Profile form, MultipartFile photo) {
         Account user = locked(current.require().id());
         UUID avatar = images.replace(user.getAvatar(), photo);
-        user.profile(form.displayName().strip(), user.getBio(), form.colorMode(), Palette.SINTERKLAAS, form.chocolateFlavor(), avatar, clock.instant());
+        user.profile(form.displayName().strip(), form.colorMode(), Palette.SINTERKLAAS, form.chocolateFlavor(), avatar, clock.instant());
     }
 
     @Transactional
@@ -144,7 +144,7 @@ public class AccountService implements UserDetailsService {
             return;
         }
         if (accounts.count() == 0) {
-            createAccount(new AccountForms.NewAccount(username, "Beheerder", "", password, password), Role.ADMIN);
+            createAccount(new AccountForms.NewAccount(username, "Beheerder", password, password), Role.ADMIN);
         }
     }
 
@@ -171,7 +171,7 @@ public class AccountService implements UserDetailsService {
         String username = normalize(form.username());
         checkUsername(username, null);
         return new Account(username, hash(form.password(), form.confirmation()), form.displayName().strip(),
-                bio(form.bio()), role, clock.instant());
+                role, clock.instant());
     }
 
     private void checkUsername(String username, UUID exception) {
@@ -187,14 +187,15 @@ public class AccountService implements UserDetailsService {
         if (!password.equals(confirmation)) {
             throw new Problem("De nieuwe wachtwoorden komen niet overeen.");
         }
-        if (password.isBlank() || password.length() < 12 || password.getBytes(StandardCharsets.UTF_8).length > 72) {
-            throw new Problem("Kies een wachtwoord van minimaal 12 tekens en maximaal 72 bytes.");
+        if (password.isBlank() || password.length() < AccountForms.MIN_PASSWORD_LENGTH
+                || password.getBytes(StandardCharsets.UTF_8).length > 72) {
+            throw new Problem("Kies een wachtwoord van minimaal " + AccountForms.MIN_PASSWORD_LENGTH + " tekens en maximaal 72 bytes.");
         }
         return encoder.encode(password);
     }
 
     private static Person person(Account account) {
-        return new Person(account.getId(), account.getDisplayName(), account.getBio(), account.getAvatar() != null,
+        return new Person(account.getId(), account.getDisplayName(), account.getAvatar() != null,
                 account.isEnabled(), account.getChocolateFlavor(), account.isChildProfile());
     }
 
@@ -205,9 +206,5 @@ public class AccountService implements UserDetailsService {
 
     private static String normalize(String username) {
         return username.strip().toLowerCase(Locale.ROOT);
-    }
-
-    private static String bio(String value) {
-        return value == null ? "" : value.strip();
     }
 }
