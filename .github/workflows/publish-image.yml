@@ -32,3 +32,5 @@ jobs:
           : "${DOCKERHUB_TOKEN:?Set the DOCKERHUB_TOKEN repository secret}"
           printf '%s' "$DOCKERHUB_TOKEN" | docker login --username "$DOCKERHUB_USERNAME" --password-stdin
           docker push "$DOCKERHUB_USERNAME/sinterklaas:$IMAGE_TAG"
+          docker tag "$DOCKERHUB_USERNAME/sinterklaas:$IMAGE_TAG" "$DOCKERHUB_USERNAME/sinterklaas:latest"
+          docker push "$DOCKERHUB_USERNAME/sinterklaas:latest"

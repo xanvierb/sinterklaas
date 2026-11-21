@@ -2,7 +2,32 @@
 
 Een Nederlandstalige familie-app voor verlanglijstjes, cadeaus reserveren en lootjes trekken.
 
-## Lokaal starten
+## Starten met Docker Compose
+
+Gebruik Docker met de Compose-plugin en voer de opdrachten uit vanuit de projectmap. Maak bij de eerste installatie een lokaal configuratiebestand aan.
+
+```sh
+cp .env.example .env
+```
+
+Open `.env` en vul `SINT_DB_PASSWORD` in. Stel bij een lege database ook `SINT_ADMIN_USERNAME` en `SINT_ADMIN_PASSWORD` in. Kies voor het beheerdersaccount een uniek wachtwoord van minstens 12 tekens en maximaal 72 bytes. Compose stelt de database-URL en uploadmap zelf in.
+
+Compose haalt standaard `xanvier/sinterklaas:latest` op. Gebruik bij een privé-image eerst `docker login`. Wil je een specifieke gepubliceerde versie draaien, zet dan bijvoorbeeld `SINT_IMAGE=xanvier/sinterklaas:v1.0.0` in `.env`.
+
+```sh
+docker compose -f compose.example.yaml up -d
+docker compose -f compose.example.yaml logs -f app
+```
+
+Zodra de app is gestart, open je [localhost:8080](http://localhost:8080) en meld je je aan als beheerder. Maak de eerste uitnodiging aan via **Beheer → Deelnemers → Uitnodigingen** en deel de link rechtstreeks met de deelnemer. Flyway past de databasemigraties bij het opstarten toe.
+
+Met `Ctrl+C` verlaat je de logweergave. Stop de app en PostgreSQL met de volgende opdracht. De database en foto's blijven bewaard in Docker-volumes.
+
+```sh
+docker compose -f compose.example.yaml down
+```
+
+## Lokaal ontwikkelen met Maven
 
 Gebruik Java 25 en de Maven-wrapper. Stel voor de eerste start op een lege database `SINT_ADMIN_USERNAME` en `SINT_ADMIN_PASSWORD` in als omgevingsvariabelen. Gebruik een uniek wachtwoord van minstens 12 tekens en maximaal 72 bytes. Een bestaand account wordt bij het starten niet gewijzigd.
 
@@ -24,37 +49,18 @@ SINT_LOCAL_DB_URL='jdbc:h2:mem:sinterklaastest;MODE=PostgreSQL;DATABASE_TO_LOWER
 
 Gebruik `SPRING_PROFILES_ACTIVE=postgres` en stel de databasevariabelen uit [.env.example](.env.example) in. Spring leest de omgevingsvariabelen van het proces. Bewaar database en uploads op persistente opslag. Achter een HTTPS-reverseproxy stel je `SINT_BASE_URL` in op de openbare HTTPS-URL en zet je `SINT_SECURE_COOKIES=true`.
 
-## Container
-
-### Docker Compose met PostgreSQL
-
-Kopieer `.env.example` naar `.env`. Vul `SINT_DB_PASSWORD` in en stel voor een lege database ook `SINT_ADMIN_USERNAME` en `SINT_ADMIN_PASSWORD` in. Compose stelt de database-URL en uploadmap in via het voorbeeldbestand.
-
-```sh
-docker compose -f compose.example.yaml up --build -d
-docker compose -f compose.example.yaml logs -f app
-```
-
-Open [localhost:8080](http://localhost:8080) zodra de app is gestart. Stop de services met `docker compose -f compose.example.yaml down`. De database en foto's blijven bewaard in Docker-volumes.
-
-### Publiceren naar Docker Hub
+## Publiceren naar Docker Hub
 
 Maak op Docker Hub een repository met de naam `sinterklaas`. Stel in de GitHub-repository onder **Settings → Secrets and variables → Actions** de variabele `DOCKERHUB_USERNAME` en het geheim `DOCKERHUB_TOKEN` in. Gebruik een Docker Hub-toegangstoken met schrijfrechten.
 
-Push een versietag vanaf de commit die je wilt publiceren. GitHub Actions bouwt de image en publiceert die met dezelfde tag.
+Push een versietag vanaf de commit die je wilt publiceren. GitHub Actions bouwt de image en publiceert die met dezelfde tag en als `latest`.
 
 ```sh
 git tag v1.0.0
 git push origin v1.0.0
 ```
 
-Gebruik bij een privé-image eerst `docker login` op de host waar je de app draait. Stel `SINT_IMAGE` in `.env` in op de gepubliceerde image, bijvoorbeeld `jouwgebruikersnaam/sinterklaas:v1.0.0`, en start Compose met:
-
-```sh
-docker compose -f compose.example.yaml up --no-build --pull always -d
-```
-
-### Losse container
+## Losse container
 
 Bouw de image vanuit de projectmap.
 
