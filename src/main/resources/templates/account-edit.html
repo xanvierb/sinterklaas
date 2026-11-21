@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="nl-NL" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout :: page('Deelnemer bewerken', ~{::article})}">
+<article>
+    <h1>Deelnemer bewerken</h1>
+    <div th:replace="~{fields :: adminNav}"></div>
+    <form class="surface form-panel fields" th:action="@{/beheer/deelnemers/{id}(id=${accountId})}" method="post" enctype="multipart/form-data" th:object="${account}">
+        <div th:replace="~{fields :: errors}"></div>
+        <div th:replace="~{fields :: identity}"></div>
+        <div>
+            <label for="photo" class="form-label">Profielfoto</label>
+            <img th:if="${hasAvatar}" class="avatar d-block mb-2"
+                 th:src="@{/deelnemers/{id}/foto(id=${accountId})}" alt="Huidige profielfoto">
+            <input id="photo" name="photo" class="form-control" type="file" accept="image/png,image/jpeg,image/webp,image/avif,.webp,.avif" data-photo-upload>
+        </div>
+        <div>
+            <label for="role" class="form-label">Rol</label>
+            <select class="form-select" th:field="*{role}">
+                <option th:each="role : ${T(nl.xanvier.sinterklaas.user.Role).values()}" th:value="${role}" th:text="${role.label}"></option>
+            </select>
+        </div>
+        <div class="form-check">
+            <input type="checkbox" class="form-check-input" th:field="*{enabled}">
+            <label for="enabled1" class="form-check-label">Account actief</label>
+        </div>
+        <div><button class="btn btn-primary">Wijzigingen opslaan</button></div>
+    </form>
+</article>
+</html>

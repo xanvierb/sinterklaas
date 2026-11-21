@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="nl-NL" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout :: page('Mijn wensen', ~{::article})}">
+<article class="wishlist-page">
+    <header class="surface wishlist-heading">
+        <h1 th:text="${listOwner != null and person.childProfile} ? |Wensen van ${person.displayName}| : 'Mijn wensenlijst'">Mijn wensenlijst</h1>
+        <div class="actions d-print-none">
+            <a class="btn btn-primary" th:href="${listOwner == null} ? @{/wensen/nieuw} : @{/wensen/nieuw(owner=${listOwner})}">Wens toevoegen</a>
+        </div>
+    </header>
+    <p th:if="${wishes.isEmpty()}" class="surface">Je lijst is nog leeg. Voeg een wens toe om te beginnen.</p>
+    <div class="wishlist-rows">
+        <article th:each="wish : ${wishes}" class="surface wish-card wishlist-row">
+            <div class="wishlist-media">
+                <img th:if="${wish.imageId != null}" loading="lazy"
+                     th:src="@{/wensen/{id}/foto(id=${wish.id})}" alt="">
+                <img th:unless="${wish.imageId != null}" class="wishlist-placeholder"
+                     th:src="@{/assets/presents.svg}" alt="">
+            </div>
+            <div class="wishlist-details">
+                <h2 th:text="${wish.title}"></h2>
+                <p th:if="${wish.inStore}" class="status-label"
+                   th:text="${wish.shopName == null} ? 'In de winkel' : |In de winkel · ${wish.shopName}|"></p>
+                <p class="pre-line wishlist-description" th:if="${!wish.description.isBlank()}" th:text="${wish.description}"></p>
+                <p class="wishlist-price" th:if="${wish.estimatedPrice != null}"><strong>Richtprijs:</strong>
+                    <span th:text="${#numbers.formatDecimal(wish.estimatedPrice, 1, 'POINT', 2, 'COMMA') + ' ' + wish.currency}"></span></p>
+                <div class="wishlist-actions actions d-print-none">
+                    <th:block th:if="${wish.productUrl != null}">
+                        <a th:replace="~{product-link :: button(${wish.productUrl}, @{/wensen/{id}/favicon(id=${wish.id})})}"></a>
+                    </th:block>
+                    <a class="btn btn-primary" th:href="@{/wensen/{id}/bewerken(id=${wish.id})}" th:text="${lockedWishes.contains(wish.id)} ? 'Privéchat' : 'Bewerken'">Bewerken</a>
+                    <form th:unless="${lockedWishes.contains(wish.id)}" th:action="@{/wensen/{id}/verwijderen(id=${wish.id})}" method="post"
+                          onsubmit="return confirm('Weet je zeker dat je deze wens wilt verwijderen?')">
+                        <button class="btn btn-outline-danger">Verwijderen</button>
+                    </form>
+                </div>
+            </div>
+        </article>
+    </div>
+</article>
+</html>

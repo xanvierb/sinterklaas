@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="nl-NL" xmlns:th="http://www.thymeleaf.org"
+      th:fragment="page(title, content)"
+      data-palette="SINTERKLAAS"
+      th:attr="data-color-mode=${viewer == null ? 'DARK' : viewer.colorMode},
+               data-bs-theme=${viewer == null or viewer.colorMode.name() == 'DARK' ? 'dark' : 'light'}">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="htmx-config" content='{"historyEnabled":false,"allowEval":false,"includeIndicatorStyles":false,"selfRequestsOnly":true}'>
+    <title th:text="${title + ' · Sinterklaas'}">Sinterklaas</title>
+    <script src="/assets/app.js"></script>
+    <link rel="stylesheet" href="/assets/bootstrap-5.3.8.min.css">
+    <link rel="stylesheet" href="/assets/app.css">
+    <link rel="stylesheet" media="print" href="/assets/print.css">
+    <script defer src="/assets/htmx-2.0.8.min.js"></script>
+</head>
+<body hx-history="false">
+    <a class="visually-hidden-focusable skip-link" href="#inhoud">Direct naar inhoud</a>
+    <header class="site-header d-print-none">
+        <div class="container header-inner">
+            <a class="brand" th:href="${signedIn} ? @{/} : @{/inloggen}">
+                <svg class="brand-mitre" viewBox="0 0 36 36" aria-hidden="true">
+                    <path d="m11 26-1 8 4-2 3 2v-8m4 0v8l3-2 4 2-2-8"
+                          fill="#861c36" stroke="#e8b761" stroke-width="1.2" stroke-linejoin="round"/>
+                    <path d="M6 27 5 15C10 11 14 6 18 2c4 4 8 9 13 13l-1 12c-7 4-17 4-24 0Z"
+                          fill="#ba2949" stroke="#f4ce82" stroke-width="1.6" stroke-linejoin="round"/>
+                    <path d="M18 4v24c4 0 8-1 11-2l1-10C25 12 21 8 18 4Z" fill="#941c3a"/>
+                    <path d="M7 24c7 2.5 15 2.5 22 0M18 10v12m-4-8h8"
+                          fill="none" stroke="#f4ce82" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+                <span>Sinterklaas</span>
+            </a>
+            <nav th:if="${signedIn}" aria-label="Hoofdnavigatie" class="site-nav">
+                <th:block th:if="${viewer.role.name() == 'USER'}">
+                    <a th:href="@{/}">Overzicht</a>
+                    <a th:href="@{/deelnemers}">Familie</a>
+                    <details class="nav-group" name="main-nav">
+                        <summary>Wensen en cadeaus</summary>
+                        <div class="nav-panel">
+                            <a th:href="@{/wensen}">Mijn wensen</a>
+                            <a th:href="@{/cadeaus}">Mijn cadeaus</a>
+                        </div>
+                    </details>
+                    <a th:href="@{/lootjes}">Lootjes</a>
+                    <a th:href="@{/chats}">Chats
+                        <span aria-live="polite" th:attr="hx-get=@{/chats/ongelezen}"
+                              hx-trigger="load, every 3s" hx-select="#chat-unread-count"></span>
+                    </a>
+                </th:block>
+                <a th:if="${viewer.role.name() == 'ADMIN'}" th:href="@{/beheer}">Beheer</a>
+                <details class="nav-group nav-account" name="main-nav">
+                    <summary>Account</summary>
+                    <div class="nav-panel">
+                        <a th:href="@{/profiel}">Profiel</a>
+                        <a th:if="${viewer.role.name() == 'USER'}" th:href="@{/gezin}">Gezin</a>
+                        <form class="nav-logout" method="post" th:action="@{/uitloggen}">
+                            <button class="nav-button">Uitloggen</button>
+                        </form>
+                    </div>
+                </details>
+            </nav>
+        </div>
+    </header>
+    <main id="inhoud" class="container page" tabindex="-1">
+        <div th:if="${notice != null}" th:text="${notice}" class="alert alert-success d-print-none" role="status"></div>
+        <th:block th:replace="${content}"></th:block>
+    </main>
+    <div class="seasonal-vignette d-print-none" aria-hidden="true">
+        <img class="seasonal-cookies seasonal-cookies-left" th:src="@{/assets/pepernoten.svg}" width="144" height="96" alt="">
+        <img class="seasonal-presents" th:src="@{/assets/presents.svg}" width="128" height="94" alt="">
+        <img class="seasonal-cookies seasonal-cookies-right" th:src="@{/assets/pepernoten.svg}" width="144" height="96" alt="">
+    </div>
+</body>
+</html>

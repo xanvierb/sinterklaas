@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="nl-NL" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout :: page('Reserveringen beheren', ~{::article})}">
+<article class="d-print-none">
+    <h1>Reserveringen beheren</h1>
+    <div th:replace="~{fields :: adminNav}"></div>
+    <p th:if="${reservations.isEmpty()}" class="surface">Er zijn nog geen reserveringen.</p>
+    <div th:unless="${reservations.isEmpty()}" class="surface table-responsive">
+        <table class="table align-middle mb-0">
+            <thead>
+                <tr><th scope="col">Cadeau</th><th scope="col">Ontvanger</th><th scope="col">Koper</th>
+                    <th scope="col">Status</th><th scope="col">Acties</th></tr>
+            </thead>
+            <tbody>
+                <tr th:each="reservation : ${reservations}">
+                    <th scope="row" th:text="${reservation.title}"></th>
+                    <td th:text="${reservation.recipient}"></td>
+                    <td>
+                        <details class="reservation-disclosure">
+                            <summary class="btn btn-sm btn-outline-primary text-nowrap">
+                                <span class="reservation-show">Toon koper</span>
+                                <span class="reservation-hide">Verberg koper</span>
+                            </summary>
+                            <span class="d-block mt-2 fw-semibold" th:text="${reservation.buyer}"></span>
+                        </details>
+                    </td>
+                    <td><span class="status-label" th:text="${reservation.status}"></span></td>
+                    <td>
+                        <details class="reservation-disclosure">
+                            <summary class="btn btn-sm btn-outline-danger text-nowrap">
+                                <span class="reservation-show">Annuleren</span>
+                                <span class="reservation-hide">Sluiten</span>
+                            </summary>
+                            <form class="reservation-confirm mt-2" method="post"
+                                  th:action="@{/beheer/cadeaus/{id}/annuleren(id=${reservation.wishId})}">
+                                <p class="small mb-2">Hiermee verwijder je ook de chat en de voortgang van dit cadeau.</p>
+                                <button class="btn btn-outline-danger btn-sm">Reservering annuleren</button>
+                            </form>
+                        </details>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</article>
+</html>

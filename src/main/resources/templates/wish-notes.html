@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="nl-NL" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout :: page('Opmerkingen bewerken', ~{::article})}">
+<article class="form-panel">
+    <h1 th:text="${wishView.title}"></h1>
+    <p>Je kunt hier extra informatie toevoegen aan je wens.</p>
+    <div class="surface mb-3">
+        <img th:if="${wishView.imageId != null}" class="wish-image mb-3"
+             th:src="@{/wensen/{id}/foto(id=${wishId})}" alt="">
+        <p th:if="${!wishView.description.isBlank()}" class="pre-line" th:text="${wishView.description}"></p>
+        <p th:if="${wishView.estimatedPrice != null}" th:text="${#numbers.formatDecimal(wishView.estimatedPrice, 1, 'POINT', 2, 'COMMA') + ' EUR'}"></p>
+        <th:block th:if="${wishView.productUrl != null}">
+            <p th:replace="~{product-link :: view(${wishView.productUrl}, @{/wensen/{id}/favicon(id=${wishId})})}"></p>
+        </th:block>
+    </div>
+    <form class="surface fields" method="post" th:action="@{/wensen/{id}/opmerkingen(id=${wishId})}" th:object="${notes}">
+        <div th:replace="~{fields :: errors}"></div>
+        <div>
+            <label for="text" class="form-label">Opmerkingen</label>
+            <textarea class="form-control" th:field="*{text}" maxlength="1000" rows="4"></textarea>
+        </div>
+        <div class="actions">
+            <button class="btn btn-primary">Opmerkingen opslaan</button>
+            <a class="btn btn-outline-primary" href="/wensen">Annuleren</a>
+        </div>
+    </form>
+</article>
+</html>

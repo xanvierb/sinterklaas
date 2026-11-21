@@ -1,0 +1,12 @@
+<p xmlns:th="http://www.thymeleaf.org" th:fragment="view(productUrl, faviconUrl)">
+    <img th:src="${faviconUrl}" width="16" height="16" class="me-1" alt="" data-shop-icon hidden>
+    <a th:href="${productUrl}" target="_blank" rel="noopener noreferrer">Bekijk product</a>
+</p>
+
+<a xmlns:th="http://www.thymeleaf.org" th:fragment="button(productUrl, faviconUrl)"
+   class="btn btn-outline-primary d-inline-flex align-items-center gap-2"
+   th:href="${productUrl}" target="_blank" rel="noopener noreferrer">
+    <img th:src="${faviconUrl}" width="16" height="16" alt="" data-shop-icon hidden>
+    <span>Webshop<span class="visually-hidden"> (opent in een nieuw tabblad)</span></span>
+    <span aria-hidden="true">↗</span>
+</a>

@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="nl-NL" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout :: page('Trekkingen beheren', ~{::article})}">
+<article>
+    <h1>Trekkingen beheren</h1>
+    <div th:replace="~{fields :: adminNav}"></div>
+    <p th:if="${drawError != null}" class="alert alert-danger" role="alert" th:text="${drawError}"></p>
+    <form class="surface form-panel fields mb-4" method="post" th:action="@{/beheer/lootjes}">
+        <div>
+            <label for="draw-name" class="form-label">Naam van de trekking</label>
+            <input id="draw-name" class="form-control" name="name" maxlength="100" required>
+        </div>
+        <div><button class="btn btn-primary">Trekking toevoegen</button></div>
+    </form>
+    <div class="wishlist-rows">
+        <section th:each="round : ${rounds}" class="surface" th:id="|trekking-${round.id}|">
+            <h2 th:text="${round.name}"></h2>
+            <p>
+                <span class="status-label" th:text="${round.visible} ? 'Zichtbaar' : 'Verborgen'"></span>
+                <span class="status-label" th:text="${round.drawn} ? 'Getrokken' : 'Nog niet getrokken'"></span>
+            </p>
+            <form th:if="${round.visible and !round.drawn}" class="fields mb-3" method="post"
+                  th:action="@{/beheer/lootjes/{id}/trekken(id=${round.id})}">
+                <fieldset>
+                    <legend class="h5">Wie doen er mee?</legend>
+                    <p class="form-text">Vink minstens twee deelnemers aan. Gekoppelde ouders kunnen het lootje van hun kind openen.</p>
+                    <div class="draw-participants">
+                        <label th:each="participant : ${participants}" class="draw-participant">
+                            <input type="checkbox" class="form-check-input" name="participantIds"
+                                   th:value="${participant.id}" checked>
+                            <img th:if="${participant.hasAvatar}" class="avatar" loading="lazy"
+                                 th:src="@{/deelnemers/{id}/foto(id=${participant.id})}" alt="">
+                            <span th:unless="${participant.hasAvatar}" class="avatar avatar-placeholder" aria-hidden="true"
+                                  th:text="${#strings.substring(participant.name, 0, 1)}"></span>
+                            <span class="participant-details">
+                                <strong th:text="${participant.name}"></strong>
+                                <small th:if="${participant.child}">Kinderprofiel</small>
+                            </span>
+                        </label>
+                    </div>
+                </fieldset>
+                <div><button class="btn btn-primary" th:disabled="${participants.size() < 2}">Trek de lootjes</button></div>
+            </form>
+            <div class="actions">
+                <a th:if="${round.drawn and revealedRound != round.id}" class="btn btn-outline-primary"
+                   th:href="@{/beheer/lootjes(reveal=${round.id})} + |#trekking-${round.id}|">Toon wie wie heeft</a>
+                <a th:if="${revealedRound == round.id}" class="btn btn-outline-primary"
+                   th:href="@{/beheer/lootjes} + |#trekking-${round.id}|">Verberg uitslag</a>
+                <form method="post" th:action="@{/beheer/lootjes/{id}/zichtbaarheid(id=${round.id})}">
+                    <input type="hidden" name="visible" th:value="${!round.visible}">
+                    <button class="btn btn-outline-primary"
+                            th:text="${round.visible} ? 'Trekking verbergen' : 'Trekking herstellen'"></button>
+                </form>
+            </div>
+            <div th:if="${revealedRound == round.id}" class="table-responsive mt-3">
+                <table class="table mb-0">
+                    <caption class="caption-top">Uitslag van de trekking</caption>
+                    <thead><tr><th scope="col">Trekker</th><th scope="col">Heeft getrokken</th></tr></thead>
+                    <tbody>
+                        <tr th:each="assignment : ${assignments}">
+                            <th scope="row" th:text="${assignment.giver}"></th>
+                            <td th:text="${assignment.recipient}"></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </div>
+</article>
+</html>

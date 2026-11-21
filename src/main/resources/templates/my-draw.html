@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="nl-NL" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout :: page('Mijn lootjes', ~{::article})}">
+<article class="draw-page d-print-none">
+    <h1>Mijn lootjes</h1>
+    <section th:each="draw : ${draws}" th:with="recipient=${draw.recipient}" class="mb-4">
+        <h2 class="draw-year" th:text="${draw.name}"></h2>
+        <p th:if="${draw.childName != null}" th:text="|Lootje van ${draw.childName}|"></p>
+    <details class="draw-envelope">
+        <summary>
+            <svg viewBox="0 0 160 104" class="draw-envelope-art" aria-hidden="true">
+                <rect x="5" y="8" width="150" height="90" rx="9" fill="#92233e" stroke="#f4ce82" stroke-width="2"/>
+                <path d="m7 91 55-43m91 43-55-43" stroke="#f4ce82" stroke-width="2" opacity=".55"/>
+                <path class="draw-flap" d="m9 13 64 52a11 11 0 0 0 14 0l64-52" fill="#b73552" stroke="#f4ce82" stroke-width="2"/>
+                <g class="draw-seal">
+                <circle cx="80" cy="65" r="13" fill="#f4ce82" stroke="#8b522c" stroke-width="1.5"/>
+                <path d="m80 57 2.4 5.6 6.1.5-4.7 4 1.4 5.9-5.2-3.2-5.2 3.2 1.4-5.9-4.7-4 6.1-.5Z" fill="#92233e"/>
+                </g>
+            </svg>
+            <span class="draw-open-label">Open je lootje</span>
+            <span class="draw-close-label">Sluit je lootje</span>
+        </summary>
+        <div class="draw-letter">
+            <div class="draw-sparks" aria-hidden="true">
+                <i></i><i></i><i></i><i></i><i></i><i></i>
+            </div>
+            <p class="mb-1" th:text="${draw.childName == null} ? 'Jij koopt een cadeau voor' : |${draw.childName} trekt|"></p>
+            <h2 th:text="${recipient.name}"></h2>
+            <a th:if="${recipient.enabled}" class="btn btn-primary"
+               th:href="@{/deelnemers/{id}/wensen(id=${recipient.id})}">Bekijk de wensenlijst</a>
+            <p th:unless="${recipient.enabled}" class="mb-0">De wensenlijst van deze deelnemer is niet beschikbaar.</p>
+        </div>
+    </details>
+    </section>
+    <p th:if="${draws.isEmpty()}" class="surface">Je hebt momenteel geen zichtbare lootjes.</p>
+</article>
+</html>

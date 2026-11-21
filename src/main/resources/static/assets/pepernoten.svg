@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 144 96">
+  <defs>
+    <g id="noot">
+      <path d="M-20 6c-2-7 4-15 11-19 8-5 20-3 26 4 5 5 6 12 2 18-5 7-30 8-37 1Z" fill="#844823"/>
+      <path d="M-20 3c-2-6 4-14 11-18 8-4 20-2 26 4 5 5 6 11 2 15-6 6-31 8-37 3Z" fill="#bc773e" stroke="#71391f" stroke-width="1.4"/>
+      <path d="M-14-4c4-6 11-10 18-8" stroke="#f4c88d" stroke-width="2" stroke-linecap="round" fill="none" opacity=".65"/>
+      <path d="m-5-4 3 2m7-6 2 1m5 8 2 1m-21 2 2 1" stroke="#743b23" stroke-width="1.5" stroke-linecap="round" opacity=".7"/>
+    </g>
+  </defs>
+  <use href="#noot" transform="translate(36 57) rotate(-23)"/>
+  <use href="#noot" transform="translate(76 36) rotate(18) scale(.83)"/>
+  <use href="#noot" transform="translate(103 65) rotate(-8) scale(.95)"/>
+  <g fill="#ca9659">
+    <circle cx="25" cy="31" r="2"/><circle cx="63" cy="72" r="2.4"/><circle cx="120" cy="44" r="1.7"/>
+    <path d="m46 22 4 1-1 3-4-1zm83 47 4-1 1 3-4 1z"/>
+  </g>
+</svg>

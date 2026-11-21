@@ -1,0 +1,59 @@
+spring:
+  application:
+    name: sinterklaas
+  datasource:
+    url: ${SINT_LOCAL_DB_URL:jdbc:h2:file:./data/sinterklaas;MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE}
+    username: sa
+    password: ${SINT_LOCAL_DB_PASSWORD:}
+    driver-class-name: org.h2.Driver
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate.jdbc.time_zone: UTC
+  servlet:
+    multipart:
+      max-file-size: ${SINT_UPLOAD_MAX:5MB}
+      max-request-size: ${SINT_REQUEST_MAX:6MB}
+  messages:
+    basename: messages
+server:
+  servlet:
+    session:
+      timeout: 30m
+      tracking-modes: cookie
+      cookie:
+        http-only: true
+        secure: ${SINT_SECURE_COOKIES:false}
+        same-site: lax
+  error:
+    include-message: never
+    include-exception: false
+    include-stacktrace: never
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+sinterklaas:
+  base-url: ${SINT_BASE_URL:http://localhost:8080}
+  upload-dir: ${SINT_UPLOAD_DIR:./uploads}
+  invite-lifetime: ${SINT_INVITE_LIFETIME:48h}
+  typesafe:
+    api-key: ${TYPESAFE_API_KEY:}
+    model: ${TYPESAFE_MODEL:jev-latest}
+  bootstrap:
+    username: ${SINT_ADMIN_USERNAME:}
+    password: ${SINT_ADMIN_PASSWORD:}
+
+---
+spring:
+  config:
+    activate:
+      on-profile: postgres
+  datasource:
+    url: ${SINT_DB_URL:jdbc:postgresql://localhost:5432/sinterklaas}
+    username: ${SINT_DB_USER:sinterklaas}
+    password: ${SINT_DB_PASSWORD:}
+    driver-class-name: org.postgresql.Driver

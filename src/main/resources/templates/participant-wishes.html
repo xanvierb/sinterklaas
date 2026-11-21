@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="nl-NL" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout :: page('Wensen van ' + person.displayName, ~{::article})}">
+<article class="wishlist-page">
+    <header class="surface wishlist-heading">
+        <p><a href="/deelnemers">Alle deelnemers</a></p>
+        <h1>Wensen van <span th:text="${person.displayName}"></span></h1>
+    </header>
+    <p th:if="${wishes.isEmpty()}" class="surface">Deze lijst bevat nog geen wensen.</p>
+    <div class="wishlist-rows">
+        <article th:each="wish : ${wishes}" class="surface wish-card wishlist-row">
+            <div class="wishlist-media">
+                <img th:if="${wish.imageId != null}" loading="lazy"
+                     th:src="@{/wensen/{id}/foto(id=${wish.id})}" alt="">
+                <img th:unless="${wish.imageId != null}" class="wishlist-placeholder"
+                     th:src="@{/assets/presents.svg}" alt="">
+            </div>
+            <div class="wishlist-details">
+                <h2 th:text="${wish.title}"></h2>
+                <p th:if="${wish.inStore}" class="status-label"
+                   th:text="${wish.shopName == null} ? 'In de winkel' : |In de winkel · ${wish.shopName}|"></p>
+                <p class="pre-line wishlist-description" th:if="${!wish.description.isBlank()}" th:text="${wish.description}"></p>
+                <p class="wishlist-price" th:if="${wish.estimatedPrice != null}"><strong>Richtprijs:</strong>
+                    <span th:text="${#numbers.formatDecimal(wish.estimatedPrice, 1, 'POINT', 2, 'COMMA') + ' ' + wish.currency}"></span></p>
+                <th:block th:if="${wish.productUrl != null}">
+                    <p th:replace="~{product-link :: view(${wish.productUrl}, @{/wensen/{id}/favicon(id=${wish.id})})}"></p>
+                </th:block>
+                <div th:if="${viewer.person.id != wish.ownerId}" class="wishlist-actions actions d-print-none"
+                     th:with="status=${availability.get(wish.id)}">
+                    <p class="status-label mb-0" th:if="${status != null}" th:text="${status.name() == 'MINE'} ? 'Door jou gereserveerd' : 'Gereserveerd'"></p>
+                    <form th:if="${status == null and viewer.role.name() == 'USER'}" method="post"
+                          th:action="@{/deelnemers/{owner}/wensen/{id}/reserveren(owner=${wish.ownerId},id=${wish.id})}">
+                        <button class="btn btn-primary">Reserveren</button>
+                    </form>
+                    <a th:if="${status != null and status.name() == 'MINE'}" class="btn btn-outline-primary"
+                       th:href="@{/reserveringen/{id}/chat(id=${wish.id})}">Stel een vraag aan de ontvanger</a>
+                    <form th:if="${status != null and status.name() == 'MINE'}" method="post"
+                          th:action="@{/reserveringen/{id}/annuleren(id=${wish.id})}">
+                        <button class="btn btn-outline-primary">Reservering annuleren</button>
+                    </form>
+                </div>
+            </div>
+        </article>
+    </div>
+</article>
+</html>

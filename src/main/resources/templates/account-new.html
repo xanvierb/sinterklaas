@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="nl-NL" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout :: page('Deelnemer aanmaken', ~{::article})}">
+<article>
+    <h1>Deelnemer aanmaken</h1>
+    <div th:replace="~{fields :: adminNav}"></div>
+    <form class="surface form-panel fields" th:action="@{/beheer/deelnemers/nieuw}" method="post" th:object="${account}">
+        <div th:replace="~{fields :: errors}"></div>
+        <div th:replace="~{fields :: identity}"></div>
+        <div>
+            <label for="role" class="form-label">Rol</label>
+            <select class="form-select" id="role" name="role">
+                <option th:each="choice : ${T(nl.xanvier.sinterklaas.user.Role).values()}"
+                        th:value="${choice}" th:text="${choice.label}" th:selected="${choice == role}"></option>
+            </select>
+        </div>
+        <div th:replace="~{fields :: newPassword}"></div>
+        <div><button class="btn btn-primary">Deelnemer aanmaken</button></div>
+    </form>
+</article>
+</html>

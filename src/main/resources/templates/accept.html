@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="nl-NL" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout :: page('Uitnodiging aannemen', ~{::section})}">
+<section class="auth-panel surface">
+    <h1>Uitnodiging aannemen</h1>
+    <form method="post" th:action="@{/uitnodiging}" th:object="${account}" class="fields">
+        <div th:replace="~{fields :: errors}"></div>
+        <input type="hidden" id="token" name="token" th:value="${token}">
+        <div>
+            <label for="username" class="form-label">Gebruikersnaam</label>
+            <input class="form-control" th:field="*{username}" maxlength="32" minlength="3"
+                   autocomplete="username" aria-describedby="username-help" required>
+            <div id="username-help" class="form-text">Met deze gebruikersnaam log je straks in.</div>
+        </div>
+        <div th:replace="~{fields :: newPassword}"></div>
+        <div>
+            <label for="chocolateFlavor" class="form-label">Favoriete chocoladeletter (optioneel)</label>
+            <select class="form-select" th:field="*{chocolateFlavor}">
+                <option value="">Later kiezen of bestaande voorkeur behouden</option>
+                <option th:each="flavor : ${T(nl.xanvier.sinterklaas.user.ChocolateFlavor).values()}"
+                        th:value="${flavor}" th:text="${flavor.label}"></option>
+            </select>
+        </div>
+        <div><button class="btn btn-primary">Account aanmaken</button></div>
+    </form>
+</section>
+</html>

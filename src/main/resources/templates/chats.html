@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="nl-NL" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout :: page('Chats', ~{::article})}">
+<article class="chat-page">
+    <h1>Chats</h1>
+    <p th:if="${chats.isEmpty()}" class="surface">Je hebt nog geen privégesprekken over cadeaus.</p>
+    <ul th:unless="${chats.isEmpty()}" class="list-unstyled fields">
+        <li th:each="chat : ${chats}">
+            <a class="surface participant-card chat-list-item"
+               th:href="@{/reserveringen/{id}/chat(id=${chat.wishId})}">
+                <img th:if="${chat.imageId != null}" th:src="@{/wensen/{id}/foto(id=${chat.wishId})}"
+                     class="chat-product-photo" width="64" height="64" loading="lazy" alt="">
+                <span class="chat-list-text">
+                    <span class="chat-name-row">
+                        <span th:replace="~{chat-avatar :: avatar(${chat})}"></span>
+                        <strong th:text="${chat.otherName}"></strong>
+                    </span>
+                    <span th:text="${chat.title}"></span>
+                </span>
+                <span th:if="${chat.unread > 0}" class="status-label flex-shrink-0" th:text="${chat.unread + ' ongelezen'}"></span>
+            </a>
+        </li>
+    </ul>
+</article>
+</html>

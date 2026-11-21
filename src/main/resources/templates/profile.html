@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="nl-NL" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout :: page('Mijn profiel', ~{::article})}">
+<article>
+    <h1>Mijn profiel</h1>
+    <div class="row g-4">
+        <div class="col-lg-7">
+            <section class="surface">
+                <h2>Persoonlijke gegevens</h2>
+                <img th:if="${person.hasAvatar}" class="avatar mb-3" th:src="@{/deelnemers/{id}/foto(id=${person.id})}" alt="Je profielfoto">
+                <form method="post" th:action="@{/profiel}" th:object="${profile}" enctype="multipart/form-data" class="fields">
+                    <div th:replace="~{fields :: errors}"></div>
+                    <div th:replace="~{fields :: displayNameField}"></div>
+                    <div>
+                        <label for="photo" class="form-label">Profielfoto</label>
+                        <input id="photo" name="photo" class="form-control" type="file" accept="image/png,image/jpeg,image/webp,image/avif,.webp,.avif" data-photo-upload>
+                    </div>
+                    <div>
+                        <label for="colorMode" class="form-label">Kleurmodus</label>
+                        <select class="form-select" th:field="*{colorMode}">
+                            <option th:each="mode : ${T(nl.xanvier.sinterklaas.user.ColorMode).values()}" th:value="${mode}" th:text="${mode.label}"></option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="chocolateFlavor" class="form-label">Favoriete chocoladeletter</label>
+                        <select class="form-select" th:field="*{chocolateFlavor}">
+                            <option value="">Geen voorkeur</option>
+                            <option th:each="flavor : ${T(nl.xanvier.sinterklaas.user.ChocolateFlavor).values()}"
+                                    th:value="${flavor}" th:text="${flavor.label}"></option>
+                        </select>
+                    </div>
+                    <div><button class="btn btn-primary">Profiel opslaan</button></div>
+                </form>
+            </section>
+        </div>
+        <div class="col-lg-5">
+            <section class="surface">
+                <h2>Wachtwoord wijzigen</h2>
+                <form method="post" th:action="@{/profiel/wachtwoord}" th:object="${password}" class="fields">
+                    <div th:replace="~{fields :: errors}"></div>
+                    <div>
+                        <label for="oldPassword" class="form-label">Huidig wachtwoord</label>
+                        <input id="oldPassword" name="oldPassword" class="form-control" type="password" autocomplete="current-password" required>
+                    </div>
+                    <div th:replace="~{fields :: newPassword}"></div>
+                    <div><button class="btn btn-outline-primary">Wachtwoord wijzigen</button></div>
+                </form>
+            </section>
+        </div>
+    </div>
+</article>
+</html>

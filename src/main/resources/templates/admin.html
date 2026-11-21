@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="nl-NL" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout :: page('Beheer', ~{::article})}">
+<article class="admin-dashboard">
+    <header class="surface wishlist-heading">
+        <h1>Beheer</h1>
+        <div class="actions">
+            <a class="btn btn-primary" th:href="@{/beheer/deelnemers/nieuw}">Deelnemer aanmaken</a>
+            <a class="btn btn-outline-primary" th:href="@{/beheer/uitnodigingen}">Uitnodigingen beheren</a>
+        </div>
+    </header>
+    <div th:replace="~{fields :: adminNav}"></div>
+    <div class="admin-shortcuts mb-4">
+        <section class="surface">
+            <h2>Deelnemers</h2>
+            <p class="mb-1"><strong th:text="${activeParticipants}"></strong> actief</p>
+            <p class="mb-0"><strong th:text="${disabledAccounts}"></strong> uitgeschakelde accounts</p>
+        </section>
+        <section class="surface">
+            <h2>Pakjesavond</h2>
+            <div class="admin-links">
+                <a th:href="@{/beheer/pakjesavond}">Datum wijzigen <span aria-hidden="true">→</span></a>
+                <a th:href="@{/beheer/afspraken}">Afspraken bewerken <span aria-hidden="true">→</span></a>
+                <a th:href="@{/beheer/lootjes}">Lootjes trekken <span aria-hidden="true">→</span></a>
+            </div>
+        </section>
+        <section class="surface">
+            <h2>Reserveringen</h2>
+            <p>Bekijk wie een cadeau heeft gereserveerd en hoe ver de aankoop is.</p>
+            <a th:href="@{/beheer/cadeaus}">Reserveringen beheren <span aria-hidden="true">→</span></a>
+        </section>
+    </div>
+    <h2>Accounts beheren</h2>
+    <div class="table-responsive surface">
+        <table class="table align-middle">
+            <thead><tr><th scope="col">Naam</th><th scope="col">Gebruikersnaam</th><th scope="col">Rol</th>
+                <th scope="col">Account</th><th scope="col"><span class="visually-hidden">Acties</span></th></tr></thead>
+            <tbody>
+                <tr th:each="account : ${accounts}">
+                    <th scope="row" th:text="${account.person.displayName}"></th>
+                    <td th:text="${account.username}"></td><td th:text="${account.role.label}"></td>
+                    <td th:text="${account.person.enabled ? 'Actief' : 'Uitgeschakeld'}"></td>
+                    <td class="actions">
+                        <a th:href="@{/beheer/deelnemers/{id}(id=${account.person.id})}">Bewerken</a>
+                        <a th:if="${account.role.name() == 'USER' and account.person.enabled}" th:href="@{/deelnemers/{id}/wensen(id=${account.person.id})}">Wensen bekijken</a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</article>
+</html>

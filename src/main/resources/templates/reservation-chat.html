@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="nl-NL" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout :: page('Privéchat', ~{::article})}">
+<article class="chat-page">
+    <p><a th:href="@{/chats}">Alle chats</a></p>
+    <section class="surface chat-window">
+        <header>
+            <div class="chat-name-row chat-header-person">
+                <span th:replace="~{chat-avatar :: avatar(${chat})}"></span>
+                <div>
+                    <h1 th:text="${chat.otherName}"></h1>
+                    <p th:text="${chat.title}"></p>
+                </div>
+            </div>
+            <p><strong>Privéchat</strong> · <span th:text="${chat.childRecipient} ? 'Alleen de koper en de gekoppelde ouders kunnen dit gesprek lezen.' : 'Alleen de koper en ontvanger kunnen dit gesprek lezen.'"></span></p>
+        </header>
+        <div th:replace="~{reservation-chat-messages :: messages}"></div>
+        <form class="chat-compose" method="post" th:action="@{/reserveringen/{id}/chat(id=${chat.wishId})}">
+            <label for="body" class="visually-hidden">Bericht</label>
+            <textarea class="form-control" id="body" name="body" maxlength="2000" rows="2" required placeholder="Typ een bericht…"></textarea>
+            <button class="btn btn-primary">Versturen</button>
+        </form>
+    </section>
+</article>
+</html>

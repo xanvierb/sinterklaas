@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="nl-NL" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout :: page('Overzicht', ~{::article})}">
+<article class="overview-page">
+    <h1>Overzicht</h1>
+    <section class="countdown-panel" aria-labelledby="countdown-heading">
+        <div class="countdown-copy">
+            <h2 id="countdown-heading">Pakjesavond</h2>
+            <p th:if="${daysUntilSinterklaas > 0}" class="countdown-value">
+                <strong th:text="${daysUntilSinterklaas}"></strong>
+                <span th:text="${daysUntilSinterklaas == 1} ? 'dag te gaan' : 'dagen te gaan'"></span>
+            </p>
+            <p th:if="${daysUntilSinterklaas == 0 and !sinterklaasPassed}" class="mb-0">Vandaag is het pakjesavond!</p>
+            <p th:if="${sinterklaasPassed}" class="mb-0">Pakjesavond is al geweest.</p>
+            <time class="countdown-date" th:text="${celebrationDateLabel}">5 december</time>
+        </div>
+        <img class="countdown-art" th:src="@{/assets/pakjesavond-illustratie.webp}"
+             width="850" height="581" alt="">
+    </section>
+    <details th:if="${agreementHtml != null}" class="surface overview-agreements">
+        <summary th:text="${agreementHeading}">Afspraken</summary>
+        <div class="overview-agreements-reveal">
+            <p class="pre-line mb-0" th:utext="${agreementHtml}"></p>
+        </div>
+    </details>
+    <section class="overview-tasks" aria-labelledby="gift-tasks">
+        <h2 id="gift-tasks">Nog te doen</h2>
+        <div class="overview-tiles">
+            <a th:if="${tasks.toOrder > 0}" class="overview-tile" th:href="@{/cadeaus(status='RESERVED',inStore=false)}">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 3h3l3 12h11l3-8H6"/><circle cx="9" cy="20" r="1"/><circle cx="18" cy="20" r="1"/></svg>
+                <span>Bestellen</span><strong th:text="${tasks.toOrder}"></strong>
+            </a>
+            <a th:if="${tasks.toBuy > 0}" class="overview-tile" th:href="@{/cadeaus(status='RESERVED',inStore=true)}">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h16l1 13H3zM8 9V7a4 4 0 0 1 8 0v2"/></svg>
+                <span>In de winkel kopen</span><strong th:text="${tasks.toBuy}"></strong>
+            </a>
+            <a th:if="${tasks.awaitingDelivery > 0}" class="overview-tile" th:href="@{/cadeaus(status='ORDERED')}">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 5h12v12H2zM14 9h4l4 4v4h-8"/><circle cx="6" cy="18" r="2"/><circle cx="18" cy="18" r="2"/></svg>
+                <span>Wacht op bezorging</span><strong th:text="${tasks.awaitingDelivery}"></strong>
+            </a>
+            <a th:if="${tasks.toWrap > 0}" class="overview-tile" th:href="@{/cadeaus(status='RECEIVED')}">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12v9h16v-9M3 8h18v4H3zM12 8v13M12 8H8a2.5 2.5 0 1 1 2.5-2.5zm0 0h4a2.5 2.5 0 1 0-2.5-2.5z"/></svg>
+                <span>Inpakken</span><strong th:text="${tasks.toWrap}"></strong>
+            </a>
+            <a th:if="${tasks.toGive > 0}" class="overview-tile" th:href="@{/cadeaus(status='WRAPPED')}">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20l-8-8a4.5 4.5 0 0 1 8-4 4.5 4.5 0 0 1 8 4z"/></svg>
+                <span>Klaar om te geven</span><strong th:text="${tasks.toGive}"></strong>
+            </a>
+        </div>
+        <p th:if="${tasks.remaining() == 0}" class="overview-empty">Geen open cadeautaken.</p>
+    </section>
+</article>
+</html>

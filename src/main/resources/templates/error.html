@@ -1,0 +1,13 @@
+<!doctype html>
+<html lang="nl-NL" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout :: page('Pagina niet beschikbaar', ~{::section})}">
+<section class="surface form-panel">
+    <h1 th:switch="${status}">
+        <th:block th:case="403">Geen toegang</th:block>
+        <th:block th:case="404">Pagina niet gevonden</th:block>
+        <th:block th:case="413">Bestand te groot</th:block>
+        <th:block th:case="400">Ongeldige aanvraag</th:block>
+        <th:block th:case="*">Er is iets misgegaan</th:block>
+    </h1>
+    <p><a href="/">Naar het overzicht</a></p>
+</section>
+</html>

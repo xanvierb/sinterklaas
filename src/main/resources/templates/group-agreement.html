@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="nl-NL" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout :: page('Groepsafspraken', ~{::article})}">
+<article class="form-panel">
+    <h1>Groepsafspraken</h1>
+    <div th:replace="~{fields :: adminNav}"></div>
+    <form class="surface fields" method="post" th:action="@{/beheer/afspraken}">
+        <p th:if="${agreementError != null}" class="alert alert-danger" role="alert" th:text="${agreementError}"></p>
+        <div>
+            <label class="form-label" for="agreement-heading">Titel op Overzicht</label>
+            <input id="agreement-heading" name="heading" maxlength="80" placeholder="Afspraken"
+                   class="form-control" th:value="${agreement.heading}">
+        </div>
+        <div>
+            <label class="form-label" for="agreement">Tekst</label>
+            <div class="actions mb-2" data-agreement-toolbar hidden>
+                <button type="button" class="btn btn-outline-primary btn-sm" data-format="bold"><strong>Vet</strong></button>
+                <button type="button" class="btn btn-outline-primary btn-sm" data-format="italic"><em>Cursief</em></button>
+                <button type="button" class="btn btn-outline-primary btn-sm" data-format="underline"><u>Onderstrepen</u></button>
+                <button type="button" class="btn btn-outline-primary btn-sm" data-format="link">Link</button>
+            </div>
+            <textarea id="agreement" name="agreement" rows="12" maxlength="5000" class="form-control"
+                      aria-describedby="agreement-hint" th:text="${agreement.text}"></textarea>
+            <p id="agreement-hint" class="form-text mb-0">Deelnemers zien deze tekst op Overzicht. Laat leeg om het blok te verbergen. Opmaak: <code>**vet**</code>, <code>*cursief*</code>, <code>++onderstreept++</code> of <code>[linktekst](https://voorbeeld.nl)</code>.</p>
+        </div>
+        <div><button class="btn btn-primary">Afspraken opslaan</button></div>
+    </form>
+</article>
+</html>

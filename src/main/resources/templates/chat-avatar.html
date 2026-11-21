@@ -1,0 +1,6 @@
+<span xmlns:th="http://www.thymeleaf.org" th:fragment="avatar(chat)" class="chat-avatar" aria-hidden="true">
+    <img th:unless="${chat.buyer}" th:src="@{/assets/sint-en-piet.webp}" alt="">
+    <img th:if="${chat.avatarOwnerId != null}" th:src="@{/deelnemers/{id}/foto(id=${chat.avatarOwnerId})}" alt="">
+    <span th:if="${chat.buyer and chat.avatarOwnerId == null}"
+          th:text="${#strings.toUpperCase(#strings.substring(chat.otherName, 0, 1))}"></span>
+</span>

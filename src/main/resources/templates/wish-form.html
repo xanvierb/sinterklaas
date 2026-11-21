@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="nl-NL" xmlns:th="http://www.thymeleaf.org" th:replace="${editing} ? ~{layout :: page('Wens bewerken', ~{::article})} : ~{layout :: page('Wens toevoegen', ~{::article})}">
+<article class="form-panel">
+    <h1 th:text="${editing} ? 'Wens bewerken' : 'Wens toevoegen'">Wens</h1>
+    <form class="surface fields" method="post" th:object="${wish}" enctype="multipart/form-data"
+          th:action="${editing} ? @{/wensen/{id}(id=${wishId})} : @{/wensen}">
+        <div th:replace="~{fields :: errors}"></div>
+        <input th:if="${!editing}" type="hidden" name="owner" th:value="${listOwner}">
+        <div data-wish-link-step>
+            <label for="productUrl" class="form-label">Productlink</label>
+            <div class="input-group">
+                <input class="form-control" th:field="*{productUrl}" type="url" maxlength="2048"
+                       placeholder="https://..." autocomplete="url">
+                <button class="btn btn-outline-primary" type="button" data-fetch-product th:text="${editing} ? 'Gegevens ophalen' : 'Volgende'">Volgende</button>
+            </div>
+            <button th:unless="${editing}" type="button" class="btn btn-link" data-wish-skip hidden>Verder zonder productlink</button>
+            <button th:unless="${editing}" type="button" class="btn btn-outline-primary mt-2" data-wish-store hidden>In de winkel kopen</button>
+        </div>
+        <p class="status-label mb-0" data-bookmark-list hidden></p>
+        <div class="form-text" data-fetch-message role="status">We lezen eerst de productgegevens uit de pagina. Ontbreken er gegevens en is TypeSafe AI ingesteld? Dan sturen we geselecteerde paginatekst voor ontbrekende tekstvelden en, indien nodig, apart afbeeldingslinks voor de productfoto.</div>
+        <details th:unless="${editing}">
+            <summary>Importeren vanuit je browser</summary>
+            <p>Sleep <a data-wish-bookmark href="#">Bewaar als wens</a> naar je bladwijzerbalk. Open het product en klik daar op de bladwijzer.</p>
+            <label for="saved-page">Werkt de bladwijzer niet? Sla de productpagina op als HTML en kies dat bestand hier. Vul ook de productlink in.</label>
+            <input type="file" class="form-control" id="saved-page" accept=".htm,.html,text/html">
+        </details>
+        <fieldset class="fields" data-wish-details th:attr="data-wish-wizard=${!editing and !#fields.hasAnyErrors()}">
+            <div>
+                <label for="title" class="form-label">Wat wens je?</label>
+                <input class="form-control" th:field="*{title}" th:errorclass="is-invalid" maxlength="120" required>
+            </div>
+            <div>
+                <label for="description" class="form-label">Omschrijving</label>
+                <textarea class="form-control" th:field="*{description}" rows="3" maxlength="2000"></textarea>
+            </div>
+            <div>
+                <div class="form-check">
+                    <input type="checkbox" class="form-check-input" th:field="*{inStore}">
+                    <label for="inStore" class="form-check-label">In een fysieke winkel kopen</label>
+                </div>
+                <label for="shopName" class="form-label mt-2">Winkel (optioneel)</label>
+                <input class="form-control" th:field="*{shopName}" maxlength="120" placeholder="Bijvoorbeeld HEMA in Utrecht">
+            </div>
+            <div>
+                <label for="estimatedPrice" class="form-label">Richtprijs in euro</label>
+                <input class="form-control" th:field="*{estimatedPrice}" type="number" min="0"
+                       max="99999999.99" step="0.01" inputmode="decimal">
+                <div class="form-text">Een ingevulde prijs is een indicatie.</div>
+            </div>
+            <div>
+                <label for="photo" class="form-label">Foto (JPEG of PNG, maximaal 5 MB)</label>
+                <input id="photo" name="photo" class="form-control" type="file" accept="image/png,image/jpeg,image/webp,image/avif,.webp,.avif" data-photo-upload>
+                <img data-wish-photo-preview class="wish-image mt-2" alt="Voorbeeld van de productfoto" hidden>
+                <img th:if="${editing and wishView.imageId != null}" class="wish-image mt-2"
+                     th:src="@{/wensen/{id}/foto(id=${wishId})}" alt="Huidige wensfoto">
+            </div>
+            <div class="actions">
+                <button class="btn btn-primary" th:text="${editing} ? 'Wijzigingen opslaan' : 'Wens toevoegen'"></button>
+                <a class="btn btn-outline-primary" th:href="${listOwner == null} ? @{/wensen} : @{/wensen(owner=${listOwner})}">Annuleren</a>
+            </div>
+        </fieldset>
+        <a th:unless="${editing}" class="btn btn-outline-primary" th:href="${listOwner == null} ? @{/wensen} : @{/wensen(owner=${listOwner})}" data-wish-cancel hidden>Annuleren</a>
+    </form>
+    <dialog th:if="${bookmarkChildren != null and !bookmarkChildren.isEmpty()}" id="bookmark-wishlist"
+            class="surface" aria-labelledby="bookmark-wishlist-title">
+        <h2 id="bookmark-wishlist-title">Op welke wensenlijst?</h2>
+        <form method="dialog" class="fields">
+            <button class="btn btn-primary" value="own" data-list-name="Mijn wensenlijst">Mijn wensenlijst</button>
+            <button th:each="child : ${bookmarkChildren}" class="btn btn-outline-primary"
+                    th:value="${child.id}" th:text="${child.displayName}"
+                    th:attr="data-list-name=|Wensenlijst van ${child.displayName}|"></button>
+            <button class="btn btn-link" value="cancel">Annuleren</button>
+        </form>
+    </dialog>
+</article>
+</html>

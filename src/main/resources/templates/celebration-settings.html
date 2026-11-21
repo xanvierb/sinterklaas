@@ -1,0 +1,16 @@
+<!doctype html>
+<html lang="nl-NL" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout :: page('Pakjesavond instellen', ~{::article})}">
+<article class="form-panel">
+    <h1>Pakjesavond instellen</h1>
+    <div th:replace="~{fields :: adminNav}"></div>
+    <form class="surface fields" method="post" th:action="@{/beheer/pakjesavond}">
+        <div>
+            <label class="form-label" for="date">Datum van pakjesavond</label>
+            <input type="date" class="form-control" id="date" name="date" th:value="${celebrationDate}"
+                   aria-describedby="date-help">
+            <p class="form-text mb-0" id="date-help">Laat leeg om elk jaar af te tellen naar 5 december.</p>
+        </div>
+        <div><button class="btn btn-primary">Datum opslaan</button></div>
+    </form>
+</article>
+</html>

@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="nl-NL" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout :: page('Inloggen', ~{::section})}">
+<section class="auth-panel surface">
+    <h1>Inloggen</h1>
+    <p class="text-body-secondary">Bekijk je verlanglijstje en regel cadeaus voor de andere deelnemers.</p>
+    <div th:if="${param.fout != null}" class="alert alert-danger" role="alert">
+        Inloggen is niet gelukt. Controleer je gegevens of vraag de beheerder of je account actief is.
+    </div>
+    <div th:if="${param.uitgelogd != null}" class="alert alert-success" role="status">Je bent uitgelogd.</div>
+    <div th:if="${param.wachtwoord != null}" class="alert alert-success" role="status">Je wachtwoord is gewijzigd. Log opnieuw in.</div>
+    <form method="post" th:action="@{/inloggen}" class="fields">
+        <div>
+            <label for="username" class="form-label">Gebruikersnaam</label>
+            <input id="username" name="username" class="form-control" autocomplete="username" maxlength="32" required>
+        </div>
+        <div>
+            <label for="password" class="form-label">Wachtwoord</label>
+            <input id="password" name="password" type="password" class="form-control" autocomplete="current-password" required>
+        </div>
+        <div><button class="btn btn-primary">Inloggen</button></div>
+    </form>
+</section>
+</html>

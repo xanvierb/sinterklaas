@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="nl-NL" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout :: page('Mijn gezin', ~{::article})}">
+<article class="family-page">
+    <header class="family-heading">
+        <h1>Mijn gezin</h1>
+        <a th:unless="${children.isEmpty()}" class="btn btn-outline-primary" href="#kinderprofiel-toevoegen">Kinderprofiel toevoegen</a>
+    </header>
+    <section th:each="request : ${requests}" class="surface mb-3">
+        <h2 th:text="|Mee beheren: ${request.name}|"></h2>
+        <p>Na acceptatie kun je de wensenlijst beheren en berichten beantwoorden.</p>
+        <form class="actions" method="post" th:action="@{/gezin/{id}/reageren(id=${request.childId})}">
+            <button class="btn btn-primary" name="accept" value="true">Accepteren</button>
+            <button class="btn btn-outline-primary" name="accept" value="false">Weigeren</button>
+        </form>
+    </section>
+    <div th:unless="${children.isEmpty()}" class="family-children mb-4">
+        <section th:each="card : ${children}" th:with="person=${card.person}" class="surface family-child">
+            <header class="family-child-heading">
+                <img th:if="${person.hasAvatar}" class="avatar" loading="lazy"
+                     th:src="@{/deelnemers/{id}/foto(id=${person.id})}" alt="">
+                <span th:unless="${person.hasAvatar}" class="avatar avatar-placeholder" aria-hidden="true"
+                      th:text="${#strings.substring(person.displayName, 0, 1)}"></span>
+                <h2 th:text="${person.displayName}"></h2>
+            </header>
+            <div>
+                <h3 class="family-parents-heading">Ouders</h3>
+                <ul class="family-parents">
+                    <li th:each="link : ${card.parents}">
+                        <span th:text="${link.name}"></span>
+                        <small th:unless="${link.accepted}">Uitgenodigd</small>
+                    </li>
+                </ul>
+            </div>
+            <a class="btn btn-primary align-self-start" th:href="@{/wensen(owner=${person.id})}">Wensenlijst beheren</a>
+            <details th:unless="${card.choices.isEmpty()}" class="family-invite">
+                <summary>Andere ouder uitnodigen</summary>
+                <form class="family-invite-form" method="post" th:action="@{/gezin/{id}/ouder(id=${person.id})}">
+                    <label class="visually-hidden" th:for="|parent-${person.id}|">Kies een deelnemer</label>
+                    <select class="form-select" th:id="|parent-${person.id}|" name="parentId" required>
+                        <option value="">Kies een deelnemer</option>
+                        <option th:each="choice : ${card.choices}" th:value="${choice.id}" th:text="${choice.name}"></option>
+                    </select>
+                    <button class="btn btn-outline-primary">Uitnodigen</button>
+                </form>
+            </details>
+        </section>
+    </div>
+    <section id="kinderprofiel-toevoegen" class="surface form-panel">
+        <h2>Kinderprofiel toevoegen</h2>
+        <p>Je kind verschijnt bij Familie. Ouders beheren de wensen en beantwoorden berichten via hun eigen account.</p>
+        <form class="fields" method="post" th:action="@{/gezin}" th:object="${child}" enctype="multipart/form-data">
+            <div th:replace="~{fields :: errors}"></div>
+            <div th:replace="~{fields :: profileFields}"></div>
+            <div>
+                <label for="photo" class="form-label">Profielfoto (optioneel)</label>
+                <input type="file" name="photo" id="photo" class="form-control" accept="image/png,image/jpeg,image/webp,image/avif,.webp,.avif" data-photo-upload>
+            </div>
+            <div>
+                <label for="chocolateFlavor" class="form-label">Favoriete chocoladeletter</label>
+                <select class="form-select" th:field="*{chocolateFlavor}">
+                    <option value="">Geen voorkeur</option>
+                    <option th:each="flavor : ${T(nl.xanvier.sinterklaas.user.ChocolateFlavor).values()}"
+                            th:value="${flavor}" th:text="${flavor.label}"></option>
+                </select>
+            </div>
+            <div><button class="btn btn-primary">Kinderprofiel toevoegen</button></div>
+        </form>
+    </section>
+</article>
+</html>

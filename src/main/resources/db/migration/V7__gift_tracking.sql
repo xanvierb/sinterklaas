@@ -1,0 +1,2 @@
+ALTER TABLE gift_reservation ADD COLUMN status varchar(16) NOT NULL DEFAULT 'RESERVED'
+    CHECK (status IN ('RESERVED', 'ORDERED', 'RECEIVED', 'WRAPPED', 'GIVEN'));

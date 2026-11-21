@@ -1,0 +1,5 @@
+<span xmlns:th="http://www.thymeleaf.org" id="chat-unread-count">
+    <span th:if="${unreadChats > 0}" class="status-label">
+        <span th:text="${unreadChats}"></span><span class="visually-hidden"> ongelezen gesprekken</span>
+    </span>
+</span>

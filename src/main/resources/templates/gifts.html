@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="nl-NL" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout :: page('Mijn cadeaus', ~{::article})}">
+<article>
+    <h1>Mijn cadeaus</h1>
+    <p th:if="${filter == null}">Volg de voortgang van je cadeaus per ontvanger.</p>
+    <p th:if="${filter != null}">
+        <span class="status-label" th:text="${inStoreFilter == true and filter.name() == 'RESERVED'} ? 'Te kopen in de winkel' : ${filter.label}"></span>
+        <a class="ms-2" th:href="@{/cadeaus}">Alle cadeaus tonen</a>
+    </p>
+    <p th:if="${groups.isEmpty() and filter == null}" class="surface">
+        Je hebt nog geen cadeaus gereserveerd. <a th:href="@{/deelnemers}">Bekijk de wensen van andere deelnemers</a>.
+    </p>
+    <p th:if="${groups.isEmpty() and filter != null}" class="surface">Geen cadeaus in deze fase.</p>
+    <section th:each="group : ${groups}" class="mb-4">
+        <h2 th:text="${group.key.name}"></h2>
+        <div class="wishlist-rows">
+            <article th:each="gift : ${group.value}" class="surface wish-card">
+                <header class="tracked-gift-heading">
+                    <img th:if="${gift.hasImage}" class="tracked-gift-photo" loading="lazy" width="80" height="80"
+                         th:src="@{/wensen/{id}/foto(id=${gift.wishId})}" alt="">
+                    <div>
+                        <h3 class="h5" th:text="${gift.title}"></h3>
+                        <span class="status-label tracked-gift-mobile-status" th:text="${gift.statusLabel()}"></span>
+                        <span th:if="${gift.inStore}" class="status-label"
+                              th:text="${gift.shopName == null} ? 'In de winkel' : |In de winkel · ${gift.shopName}|"></span>
+                    </div>
+                </header>
+                <form method="post" th:action="@{/cadeaus/{id}/status(id=${gift.wishId})}">
+                    <input type="hidden" name="expected" th:value="${gift.status.name()}">
+                    <input th:if="${filter != null}" type="hidden" name="status" th:value="${filter.name()}">
+                    <input th:if="${inStoreFilter != null}" type="hidden" name="inStore" th:value="${inStoreFilter}">
+                    <div th:if="${gift.nextStatus != null}" class="tracked-gift-next d-print-none">
+                        <button class="btn btn-primary" name="back" value="false"
+                                th:text="|Markeer als ${#strings.toLowerCase(gift.nextLabel)}|"></button>
+                    </div>
+                    <ol class="gift-timeline" aria-label="Cadeauvoortgang">
+                        <li th:each="step : ${gift.timeline}"
+                            th:with="previous=${step.status == gift.previousStatus}, next=${step.status == gift.nextStatus}"
+                            th:classappend="${step.reached} ? 'is-reached' : ''"
+                            th:attr="aria-current=${step.current} ? 'step' : null">
+                            <div class="gift-stage" th:classappend="${previous or next} ? 'is-selectable' : ''">
+                                <span class="gift-stage-icon" th:switch="${step.status.name()}" aria-hidden="true">
+                                    <svg th:case="'RESERVED'" viewBox="0 0 24 24"><path d="M6 3h12v18l-6-4-6 4z"/></svg>
+                                    <svg th:case="'ORDERED'" viewBox="0 0 24 24"><path d="M2 3h3l3 12h11l3-8H6"/><circle cx="9" cy="20" r="1"/><circle cx="18" cy="20" r="1"/></svg>
+                                    <svg th:case="'RECEIVED'" viewBox="0 0 24 24"><path d="M3 7l9-4 9 4v10l-9 4-9-4zM3 7l9 4 9-4M12 11v10M7.5 5l9 4"/></svg>
+                                    <svg th:case="'WRAPPED'" viewBox="0 0 24 24"><path d="M4 12v9h16v-9M3 8h18v4H3zM12 8v13M12 8H8a2.5 2.5 0 1 1 2.5-2.5zm0 0h4a2.5 2.5 0 1 0-2.5-2.5z"/></svg>
+                                    <svg th:case="'GIVEN'" viewBox="0 0 24 24"><path d="M12 20l-8-8a4.5 4.5 0 0 1 8-4 4.5 4.5 0 0 1 8 4z"/></svg>
+                                </span>
+                                <span th:text="${step.label}"></span>
+                                <button th:if="${previous or next}" type="submit" class="gift-stage-select d-print-none"
+                                        name="back" th:value="${previous}"
+                                        th:aria-label="${previous} ? |Terug naar ${step.label}| : |Markeer als ${step.label}|"></button>
+                                <button th:if="${step.current and gift.previousStatus != null}" type="submit"
+                                        class="gift-step-arrow gift-step-previous d-print-none" name="back" value="true"
+                                        th:aria-label="|Terug naar ${gift.previousLabel}|" th:title="|Terug naar ${gift.previousLabel}|">
+                                    <span aria-hidden="true">‹</span>
+                                </button>
+                                <button th:if="${step.current and gift.nextStatus != null}" type="submit"
+                                        class="gift-step-arrow gift-step-next d-print-none" name="back" value="false"
+                                        th:aria-label="|Markeer als ${gift.nextLabel}|" th:title="|Markeer als ${gift.nextLabel}|">
+                                    <span aria-hidden="true">›</span>
+                                </button>
+                            </div>
+                            <button th:if="${step.time != null}" type="button"
+                                    class="gift-time-button d-print-none" data-edit-gift-time
+                                    th:attr="data-action=@{/cadeaus/{id}/tijd(id=${gift.wishId})},
+                                             data-step=${step.status.name()}, data-time=${step.pickerTime}"
+                                    th:aria-label="|Datum en tijd wijzigen voor ${step.label}|">
+                                <time th:datetime="${step.time}" th:text="${step.timeLabel}"></time>
+                            </button>
+                            <time th:if="${step.time != null}" class="d-none d-print-block"
+                                  th:datetime="${step.time}" th:text="${step.timeLabel}"></time>
+                        </li>
+                    </ol>
+                </form>
+                <div class="actions d-print-none">
+                    <th:block th:if="${gift.productUrl != null}">
+                        <a th:replace="~{product-link :: button(${gift.productUrl}, @{/reserveringen/{id}/favicon(id=${gift.wishId})})}"></a>
+                    </th:block>
+                    <a class="btn btn-outline-primary"
+                       th:href="@{/reserveringen/{id}/chat(id=${gift.wishId})}">Stel een vraag aan de ontvanger</a>
+                </div>
+                <details class="tracked-gift-cancel d-print-none">
+                    <summary>Reservering annuleren</summary>
+                    <form class="reservation-confirm mt-2" method="post"
+                          th:action="@{/reserveringen/{id}/annuleren(id=${gift.wishId})}">
+                        <input th:if="${filter != null}" type="hidden" name="status" th:value="${filter.name()}">
+                        <input th:if="${inStoreFilter != null}" type="hidden" name="inStore" th:value="${inStoreFilter}">
+                        <p class="mb-1"><strong th:text="${gift.title}"></strong> · <span th:text="${gift.statusLabel()}"></span></p>
+                        <p>Na annuleren kan iemand anders dit cadeau reserveren.</p>
+                        <button class="btn btn-outline-danger">Annulering bevestigen</button>
+                    </form>
+                </details>
+            </article>
+        </div>
+    </section>
+    <dialog id="gift-time-editor" class="surface" aria-labelledby="gift-time-heading">
+        <h2 id="gift-time-heading" class="h5">Datum en tijd wijzigen</h2>
+        <form method="post" th:action="@{/cadeaus}">
+            <input type="hidden" name="step">
+            <label for="gift-time" class="form-label">Datum en tijd in Amsterdam</label>
+            <input id="gift-time" name="time" type="datetime-local" step="1" required class="form-control mb-3">
+            <div class="actions">
+                <button type="button" class="btn btn-outline-primary" data-close-gift-time>Annuleren</button>
+                <button class="btn btn-primary">Opslaan</button>
+            </div>
+        </form>
+    </dialog>
+</article>
+</html>

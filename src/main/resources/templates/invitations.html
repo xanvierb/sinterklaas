@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="nl-NL" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout :: page('Uitnodigingen', ~{::article})}">
+<article>
+    <h1>Uitnodigingen</h1>
+    <div th:replace="~{fields :: adminNav}"></div>
+    <section class="surface mb-4">
+        <h2>Nieuwe uitnodiging</h2>
+        <p th:if="${linkError != null}" class="alert alert-danger" th:text="${linkError}"></p>
+        <p>Deel de link met één deelnemer. Actieve links kun je later opnieuw kopiëren.</p>
+        <form th:unless="${invitationLink != null}" th:action="@{/beheer/uitnodigingen}" method="post"
+              th:object="${draft}" enctype="multipart/form-data" class="fields form-panel">
+            <div th:replace="~{fields :: errors}"></div>
+            <div th:replace="~{fields :: profileFields}"></div>
+            <div>
+                <label for="photo" class="form-label">Profielfoto (optioneel)</label>
+                <input id="photo" name="photo" class="form-control" type="file" accept="image/png,image/jpeg,image/webp,image/avif,.webp,.avif" data-photo-upload>
+            </div>
+            <div>
+                <label for="chocolateFlavor" class="form-label">Favoriete chocoladeletter</label>
+                <select class="form-select" th:field="*{chocolateFlavor}">
+                    <option value="">Geen voorkeur</option>
+                    <option th:each="flavor : ${T(nl.xanvier.sinterklaas.user.ChocolateFlavor).values()}"
+                            th:value="${flavor}" th:text="${flavor.label}"></option>
+                </select>
+            </div>
+            <div><button class="btn btn-primary">Uitnodigingslink aanmaken</button></div>
+        </form>
+        <div th:if="${invitationLink != null}" class="mt-3" id="uitnodigingslink">
+            <label for="invite-link" class="form-label">Uitnodigingslink</label>
+            <div class="input-group">
+                <input id="invite-link" class="form-control" th:value="${invitationLink}" readonly>
+                <button class="btn btn-outline-primary" type="button" data-copy-invite hidden>Kopiëren</button>
+            </div>
+            <a class="btn btn-link px-0" th:href="@{/beheer/uitnodigingen}">Nog een uitnodiging aanmaken</a>
+            <p class="form-text" id="copy-result" role="status">Je kunt de link ook handmatig selecteren en kopiëren.</p>
+        </div>
+    </section>
+    <section class="surface">
+        <h2>Uitnodigingsoverzicht</h2>
+        <p th:if="${invitations.isEmpty()}">Er zijn nog geen uitnodigingen.</p>
+        <ul class="list-group list-group-flush">
+            <li th:each="invite : ${invitations}" class="list-group-item d-flex flex-wrap gap-2 justify-content-between align-items-center">
+                <span><strong th:if="${invite.displayName != null}" th:text="${invite.displayName}"></strong>
+                <span th:text="${invite.status + ' · geldig tot ' + #temporals.format(invite.expiresAt, 'd MMMM yyyy HH:mm')}"></span></span>
+                <div th:if="${invite.cancellable}" class="actions">
+                    <form th:if="${invite.copyable}" th:action="@{/beheer/uitnodigingen/{id}/link(id=${invite.id})}"
+                          th:attr="data-copy-invite-url=@{/beheer/uitnodigingen/{id}/kopieren(id=${invite.id})}" method="post">
+                        <button class="btn btn-sm btn-outline-primary">Link kopiëren</button>
+                        <span class="small" data-invite-copy-status role="status"></span>
+                        <input class="form-control form-control-sm mt-2" data-invite-copy-fallback
+                               aria-label="Uitnodigingslink" readonly hidden>
+                    </form>
+                    <details th:unless="${invite.copyable}">
+                        <summary>Oude link vervangen</summary>
+                        <p class="small">De eerder gedeelde link werkt daarna niet meer.</p>
+                        <form th:action="@{/beheer/uitnodigingen/{id}/link(id=${invite.id})}" method="post">
+                            <button class="btn btn-sm btn-outline-primary" name="replace" value="true">Link vervangen</button>
+                        </form>
+                    </details>
+                <form th:action="@{/beheer/uitnodigingen/{id}/intrekken(id=${invite.id})}" method="post">
+                    <button class="btn btn-sm btn-outline-danger">Intrekken</button>
+                </form>
+                </div>
+            </li>
+        </ul>
+    </section>
+</article>
+</html>
